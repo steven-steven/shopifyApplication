@@ -5,23 +5,25 @@ import Header from '../components/header'
 import OptionListSection from '../components/optionListSection'
 import SearchBar from '../components/searchBar'
 import SelectedListSection from '../components/selectedListSection'
-import { GetStaticProps } from 'next'
-import { access } from 'fs'
+import { Movie } from '../components/context/selectionContext'
+
+type movieList = { [key: string]: Movie };
 
 export default function Home() {
-  const [options, setOptions] = useState({})
+  const [options, setOptions] = useState<movieList>({} as movieList)
 
   const searchByTitle = async () => {
     const res = await fetch('http://www.omdbapi.com/?apikey=99c14cff&page=1&s=ram');
     const options = await res.json();
-    if(options && options.Response == 'True'){
+    if (options && options.Response == 'True') {
       const sanitizedList = options.Search.reduce((acc, mov) => {
         acc[mov.imdbID] = {
+          'id': mov.imdbID,
           'title': mov.Title,
           'year': mov.Year,
           'type': mov.Type,
           'poster': mov.Poster
-        }
+        } as Movie;
         return acc;
       }, {});
       setOptions(sanitizedList);
@@ -34,15 +36,15 @@ export default function Home() {
         <title>IMDB Nomination Picker</title>
       </Head>
       <div className='flex flex-col'>
-        <Header/>
+        <Header />
         <div className='flex md:flex-row flex-grow'>
           <div className='leftCol flex flex-col flex-grow'>
-            <SearchBar searchByTitle={searchByTitle}/>
-            <OptionListSection options={options}/>
+            <SearchBar searchByTitle={searchByTitle} />
+            <OptionListSection options={options} />
           </div>
           <div className='rightCol flex flex-col w-1/3'>
-            <DetailSection/>
-            <SelectedListSection/>
+            <DetailSection />
+            <SelectedListSection />
           </div>
         </div>
       </div>
