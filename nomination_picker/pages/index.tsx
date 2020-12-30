@@ -14,22 +14,26 @@ export default function Home() {
   const [options, setOptions] = useState<movieList>({} as movieList)
 
   const searchByTitle = async (text) => {
-    const res = await fetch(`http://www.omdbapi.com/?apikey=99c14cff&s=${text}`);
-    const options = await res.json();
-    if (options && options.Response == 'True') {
-      const sanitizedList = options.Search.reduce((acc, mov) => {
-        acc[mov.imdbID] = {
-          'id': mov.imdbID,
-          'title': mov.Title,
-          'year': mov.Year,
-          'type': mov.Type,
-          'poster': mov.Poster
-        } as Movie;
-        return acc;
-      }, {});
-      setOptions(sanitizedList);
-    } else {
-      setOptions({});
+    try {
+      const res = await fetch(`http://www.omdbapi.com/?apikey=99c14cff&s=${text}`, { mode: 'no-cors' });
+      const options = await res.json();
+      if (options && options.Response == 'True') {
+        const sanitizedList = options.Search.reduce((acc, mov) => {
+          acc[mov.imdbID] = {
+            'id': mov.imdbID,
+            'title': mov.Title,
+            'year': mov.Year,
+            'type': mov.Type,
+            'poster': mov.Poster
+          } as Movie;
+          return acc;
+        }, {});
+        setOptions(sanitizedList);
+      } else {
+        setOptions({});
+      }
+    } catch (err) {
+      alert(err);
     }
   }
 
