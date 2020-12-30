@@ -11,15 +11,20 @@ export type Movie = {
 export type InitialStateType = {
   selectedMovie: Movie;
   nominationList: Movie[];
+  reachedMaxNominationWarning: boolean;
+  hasMaxNominationError: boolean;
 }
 
 export enum ActionTypes {
   View = 'SET_SELECTION',
   RemoveNomination = 'REMOVE_NOMINATION',
   SetNomination = 'SET_NOMINATION',
+  CloseMsgBanner = 'CLOSE_BANNER',
 }
 
-const initialState = { selectedMovie: null, nominationList: [] }
+export const MAX_NOMINATION = 5;
+
+const initialState = { selectedMovie: null, nominationList: [], hasMaxNominationError: false, reachedMaxNominationWarning: false }
 const reducer = (state, action) => {
   switch (action.type) {
     case ActionTypes.View:
@@ -30,12 +35,28 @@ const reducer = (state, action) => {
     case ActionTypes.RemoveNomination:
       return {
         ...state,
+        hasMaxNominationError: false,
+        reachedMaxNominationWarning: false,
         nominationList: state.nominationList.filter(item => item.id !== action.payload.idToDelete)
       };
     case ActionTypes.SetNomination:
+      if (state.nominationList.length == MAX_NOMINATION) {
+        // reach limit. don't add
+        return {
+          ...state,
+          hasMaxNominationError: true
+        };
+      }
       return {
         ...state,
+        reachedMaxNominationWarning: state.nominationList.length + 1 == MAX_NOMINATION,
         nominationList: [...state.nominationList, state.selectedMovie]
+      };
+    case ActionTypes.CloseMsgBanner:
+      return {
+        ...state,
+        reachedMaxNominationWarning: false,
+        hasMaxNominationError: false,
       };
     default:
       return state;

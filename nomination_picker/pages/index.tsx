@@ -6,14 +6,15 @@ import OptionListSection from '../components/optionListSection'
 import SearchBar from '../components/searchBar'
 import SelectedListSection from '../components/selectedListSection'
 import { Movie } from '../components/context/selectionContext'
+import MessageBanner from '../components/msgBanner'
 
 type movieList = { [key: string]: Movie };
 
 export default function Home() {
   const [options, setOptions] = useState<movieList>({} as movieList)
 
-  const searchByTitle = async () => {
-    const res = await fetch('http://www.omdbapi.com/?apikey=99c14cff&page=1&s=ram');
+  const searchByTitle = async (text) => {
+    const res = await fetch(`http://www.omdbapi.com/?apikey=99c14cff&s=${text}`);
     const options = await res.json();
     if (options && options.Response == 'True') {
       const sanitizedList = options.Search.reduce((acc, mov) => {
@@ -27,6 +28,8 @@ export default function Home() {
         return acc;
       }, {});
       setOptions(sanitizedList);
+    } else {
+      setOptions({});
     }
   }
 
@@ -42,10 +45,13 @@ export default function Home() {
             <SearchBar searchByTitle={searchByTitle} />
             <OptionListSection options={options} />
           </div>
-          <div className='rightCol flex flex-col w-1/3'>
+          <div className='rightCol flex flex-col w-2/5'>
             <DetailSection />
             <SelectedListSection />
           </div>
+        </div>
+        <div className='relative'>
+          <MessageBanner />
         </div>
       </div>
     </div>

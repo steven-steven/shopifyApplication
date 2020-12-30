@@ -10,25 +10,28 @@ const DetailSection = () => {
   const nominationIds = useMemo(() => state.nominationList.map(i => i.id), [state.nominationList]);
   const isAlreadyInNomination = state.selectedMovie && nominationIds.includes(state.selectedMovie.id);
 
+  if (!state.selectedMovie) return (<></>)
   return (
-    <div className='border-2 h-72'>
-      Detail Section...
+    <div className='h-72 bg-gray-800 text-white'>
       {state.selectedMovie && (
-        <div>
-          <img className='h-40' src={state.selectedMovie.poster} alt="poster" />
-          <h2>{state.selectedMovie.title}</h2>
-          {state.selectedMovie.year}
-          {state.selectedMovie.type}
+        <div className='flex flex-row h-full'>
+          <img className='h-full max-w-xs' src={state.selectedMovie.poster} alt="poster" />
+          <div className='flex-grow flex flex-col'>
+            <div className='flex-grow p-3'>
+              <p className='font-bold text-center pb-3'>{state.selectedMovie.title}</p>
+              <p>Year: {state.selectedMovie.year}</p>
+              <p>Type: {state.selectedMovie.type}</p>
+            </div>
+            <button
+              className='disabled:opacity-10 disabled:hover:none m-1 py-2 px-3 text-white transition-colors duration-150 bg-blue-500 rounded-lg'
+              onClick={addSelectedToNomination}
+              disabled={isAlreadyInNomination}
+            >
+              Add to Your Nomination List
+            </button>
+          </div>
         </div>
       )}
-      <button
-        className='disabled:opacity-50 inline-flex items-center h-10 px-5 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800'
-        onClick={addSelectedToNomination}
-        disabled={isAlreadyInNomination}
-      >
-        <span>Add to Your Nomination List&nbsp;&nbsp;</span>
-        <CgChevronDoubleDownR />
-      </button>
     </div>
   );
 }
