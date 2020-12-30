@@ -12,10 +12,12 @@
     "@tailwindcss/forms": "^0.2.1",
     "@tailwindcss/typography": "^0.2.0",
     "autoprefixer": "^10.0.2",
+    "firebase": "^8.2.1",
     "next": "^10.0.2",
     "postcss": "^8.1.7",
     "react": "17.0.1",
     "react-dom": "17.0.1",
+    "react-hook-form": "^6.13.1",
     "sass": "^1.28.0",
     "tailwindcss": "^2.0.1"
   },
