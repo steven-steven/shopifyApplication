@@ -23,7 +23,7 @@ const OptionListSection = ({ options }: inputProps) => {
       <ul>
         {Object.keys(options).map((id) => (
           <li
-            className={`cursor-pointer hover:text-blue-400 hover:bg-blue-100 h-12 text-center rounded-md px-2 py-2 my-2 ${state.selectedMovie.id == id ? 'text-blue-400 bg-blue-100' : ''}`}
+            className={`cursor-pointer hover:text-blue-400 hover:bg-blue-100 h-12 text-center rounded-md px-2 py-2 my-2 ${state.selectedMovie && state.selectedMovie.id == id ? 'text-blue-400 bg-blue-100' : ''}`}
             onClick={onSelect(id)}
             key={id}
           >
