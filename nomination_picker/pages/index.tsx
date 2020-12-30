@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Head from 'next/head'
+import axios from 'axios'
 import DetailSection from '../components/detailSection'
 import Header from '../components/header'
 import OptionListSection from '../components/optionListSection'
@@ -15,8 +16,8 @@ export default function Home() {
 
   const searchByTitle = async (text) => {
     try {
-      const res = await fetch(`http://www.omdbapi.com/?apikey=99c14cff&s=${text}`, { mode: 'no-cors' });
-      const options = await res.json();
+      const res = await axios.get(`https://www.omdbapi.com/?apikey=99c14cff&s=${text}`);
+      const options = res.data;
       if (options && options.Response == 'True') {
         const sanitizedList = options.Search.reduce((acc, mov) => {
           acc[mov.imdbID] = {
