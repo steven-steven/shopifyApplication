@@ -3,7 +3,7 @@ import { useStorage } from './hooks/useStorage';
 import { useEffect, useState, useMemo } from 'react';
 
 const CustomGallery = (): JSX.Element => {
-  const { userImages } = useStorage(null);
+  const { userImages } = useStorage();
   const [selectedUrls, setSelectedUrls] = useState([]);
   const [picsObj, setPicsObj] = useState(userImages);
 
@@ -27,6 +27,11 @@ const CustomGallery = (): JSX.Element => {
   // }, []);
 
   useEffect(() => {
+    userImages.map((i) => {
+      i.customOverlay = (<div className='absolute bottom-0 w-full p-2 text-white bg-gray-800 overflow-ellipsis'>
+        {i.caption}
+      </div>)
+    })
     setPicsObj(userImages);
   }, [userImages]);
 

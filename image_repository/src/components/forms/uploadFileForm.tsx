@@ -1,38 +1,47 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useStorage } from '../hooks/useStorage';
 
 function UploadFileForm() {
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState(null);
   const [error, setError] = useState(null);
   // Getting the progress and url from the hook
-  const { progress } = useStorage(file);
+  const { uploadFiles, progress } = useStorage();
 
   const types = ["image/png", "image/jpeg", "image/jpg"];
 
   const handleChange = (e) => {
-    let selectedFile = e.target.files[0];
-
-    if (selectedFile) {
-      if (types.includes(selectedFile.type)) {
-        setError(null);
-        setFile(selectedFile);
-      } else {
-        setFile(null);
-        setError("Please select an image file (png or jpg)");
+    const newFiles = [];
+    for (let i = 0; i < e.target.files.length; i++) {
+      // validate each file
+      const newFile = e.target.files[i];
+      if (newFile) {
+        if (types.includes(newFile.type)) {
+          newFiles.push(newFile);
+        } else {
+          setFiles(null);
+          setError("Please select an image file (png or jpg)");
+          return;
+        }
       }
     }
+    setError(null);
+    setFiles(newFiles);
   };
+
+  useEffect(() => {
+    if (files) uploadFiles(files)
+  }, [files]);
 
   return (
     <div>
       <form>
         <label>
-          <input type="file" onChange={handleChange} />
-          <span>Upload Image</span>
+          <input type="file" multiple onChange={handleChange} />
+          <span>Upload Images</span>
         </label>
       </form>
       {error && <p>{error}</p>}
-      {file && <p>{progress}% uploaded</p>}
+      {files && <p>{progress}% uploaded</p>}
     </div>
   );
 }

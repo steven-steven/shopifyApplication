@@ -3,7 +3,7 @@ import { storage, db } from '../../config/firebase';
 import { useAuth } from './useAuth';
 import { v4 as uuidv4 } from 'uuid';
 
-export const useStorage = (file) => {
+export const useStorage = () => {
   const { user } = useAuth();
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
@@ -23,11 +23,6 @@ export const useStorage = (file) => {
         return { error };
       });
   };
-
-  // const getUrl = async (imgRef) => {
-  //   const url = await imgRef.getDownloadURL();
-  //   return url;
-  // }
 
   // const listPaginatedFiles = async () => {
   //   const fileResults = [];
@@ -65,12 +60,11 @@ export const useStorage = (file) => {
           images.push({
             src: doc.data().url,
             thumbnail: doc.data().url,
+            caption: doc.data().name,
             thumbnailWidth: 320,
             thumbnailHeight: 212
           });
         })
-        console.log('imagess')
-        console.log(images);
         setUserImages(images);
       });
     return () => unsubscribe();
@@ -78,15 +72,19 @@ export const useStorage = (file) => {
 
   // runs every time the file value changes. Then adds that.
   // unique id for file name?
-  useEffect(() => {
-    if (file) {
+  const uploadFiles = (files) => {
+
+    const promises = [];
+    files.forEach(file => {
       // storage ref
       const newFileId = uuidv4();
       const storageRef = userStorage.child(newFileId);
+      const uploadTask = storageRef.put(file);
+      promises.push(uploadTask);
 
-      storageRef.put(file).on(
+      uploadTask.on(
         "state_changed",
-        (snap) => {
+        snap => {
           // track the upload progress
           let percentage =
             Math.round(
@@ -101,10 +99,13 @@ export const useStorage = (file) => {
           // get the public download img url
           const downloadUrl = await storageRef.getDownloadURL();
           await createImage({ url: downloadUrl, name: file.name, imageId: newFileId })
-        }
+        },
       );
-    }
-  }, [file]);
+    });
+    Promise.all(promises)
+      .then(() => alert('All files uploaded'))
+      .catch(err => console.log(err.code));
+  };
 
-  return { userImages, progress, error };
+  return { uploadFiles, userImages, progress, error };
 };
