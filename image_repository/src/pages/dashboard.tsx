@@ -1,7 +1,9 @@
 import { useRequireAuth } from '../components/hooks/useRequireAuth';
+import UploadFileForm from '../components/forms/uploadFileForm';
+import Gallery from '../components/gallery';
 
 const DashBoardPage: React.FC = () => {
-  const auth = useRequireAuth()
+  const auth = useRequireAuth();
 
   if (!auth.user) return null;
   return (
@@ -21,7 +23,9 @@ const DashBoardPage: React.FC = () => {
             Sign out
           </button>
         </div>
+        <UploadFileForm />
       </div>
+      <Gallery />,
     </div>
   );
 };
