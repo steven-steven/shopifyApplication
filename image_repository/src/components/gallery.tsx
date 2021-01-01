@@ -1,30 +1,34 @@
 import Gallery from 'react-grid-gallery';
 import { useStorage } from './hooks/useStorage';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 const CustomGallery = (): JSX.Element => {
-  const { listPaginatedFiles } = useStorage(null);
-  const [picsObj, setPicsObj] = useState([]);
+  const { userImages } = useStorage(null);
   const [selectedUrls, setSelectedUrls] = useState([]);
+  const [picsObj, setPicsObj] = useState(userImages);
 
   // load all images
+  // useEffect(() => {
+  //   const initializeFiles = async () => {
+  //     const res = await listPaginatedFiles();
+  //     if (res) {
+  //       const imageObjects = res.map((url) => {
+  //         return {
+  //           src: url,
+  //           thumbnail: url,
+  //           thumbnailWidth: 320,
+  //           thumbnailHeight: 212
+  //         }
+  //       });
+  //       setPicsObj(imageObjects);
+  //     }
+  //   }
+  //   initializeFiles();
+  // }, []);
+
   useEffect(() => {
-    const initializeFiles = async () => {
-      const res = await listPaginatedFiles();
-      if (res) {
-        const imageObjects = res.map((url) => {
-          return {
-            src: url,
-            thumbnail: url,
-            thumbnailWidth: 320,
-            thumbnailHeight: 212
-          }
-        });
-        setPicsObj(imageObjects);
-      }
-    }
-    initializeFiles();
-  }, []);
+    setPicsObj(userImages);
+  }, [userImages]);
 
   const onSelectImage = (index, imageObj) => {
     // make a copy of state and mutate it
