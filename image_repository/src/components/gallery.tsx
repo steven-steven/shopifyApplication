@@ -1,60 +1,26 @@
 import Gallery from 'react-grid-gallery';
-import { useStorage } from './hooks/useStorage';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useContext, useMemo } from 'react';
+import { RepositoryContext, InitialStateType, ActionTypes, Image } from './context/repositoryContext'
 
 const CustomGallery = (): JSX.Element => {
-  const { userImages } = useStorage();
-  const [selectedUrls, setSelectedUrls] = useState([]);
-  const [picsObj, setPicsObj] = useState(userImages);
+  const { state, dispatch }: { state: InitialStateType, dispatch: React.Dispatch<any> } = useContext(RepositoryContext);
 
-  // load all images
-  // useEffect(() => {
-  //   const initializeFiles = async () => {
-  //     const res = await listPaginatedFiles();
-  //     if (res) {
-  //       const imageObjects = res.map((url) => {
-  //         return {
-  //           src: url,
-  //           thumbnail: url,
-  //           thumbnailWidth: 320,
-  //           thumbnailHeight: 212
-  //         }
-  //       });
-  //       setPicsObj(imageObjects);
-  //     }
-  //   }
-  //   initializeFiles();
-  // }, []);
-
-  useEffect(() => {
-    userImages.map((i) => {
-      i.customOverlay = (<div className='absolute bottom-0 w-full p-2 text-white bg-gray-800 overflow-ellipsis'>
-        {i.caption}
-      </div>)
-    })
-    setPicsObj(userImages);
-  }, [userImages]);
+  const customImageList: Image[] = useMemo(() => state.userImages.map((i) => {
+    i.customOverlay = (<div className='absolute bottom-0 w-full p-2 text-white bg-gray-800 overflow-ellipsis'>
+      {i.caption}
+    </div>)
+    return i;
+  }), [state.userImages])
 
   const onSelectImage = (index, imageObj) => {
-    // make a copy of state and mutate it
-    var images = picsObj.slice();
-
-    var img = images[index];
-    if (img.hasOwnProperty("isSelected")) img.isSelected = !img.isSelected;
-    else img.isSelected = true;
-
-    if (!img.isSelected) setSelectedUrls(selectedUrls.filter(selected => selected !== imageObj.src));
-    else setSelectedUrls([...selectedUrls, imageObj.src]);
-
-    console.log(selectedUrls);
-
-    setPicsObj(images);
+    const img = customImageList[index];
+    if (img.hasOwnProperty("isSelected") && img.isSelected === true) dispatch({ type: ActionTypes.DESELECT_PIC_IDS, payload: { id: imageObj.id, index } });
+    else dispatch({ type: ActionTypes.SELECT_PIC_IDS, payload: { id: imageObj.id, index } });
   }
 
   return (
     <div>
-      <p>selected: {selectedUrls.length}</p>
-      <Gallery images={picsObj} onSelectImage={onSelectImage} lightBoxWidth={1536} backdropClosesModal={true} />,
+      <Gallery images={customImageList} onSelectImage={onSelectImage} lightBoxWidth={1536} backdropClosesModal={true} />,
     </div>
   );
 };

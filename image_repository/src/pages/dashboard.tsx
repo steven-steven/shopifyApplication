@@ -1,15 +1,20 @@
+
 import { useRequireAuth } from '../components/hooks/useRequireAuth';
-import UploadFileForm from '../components/forms/uploadFileForm';
 import Gallery from '../components/gallery';
+import Menu from '../components/menu';
+import { StorageProvider } from '../components/hooks/useStorage';
 
 const DashBoardPage: React.FC = () => {
   const auth = useRequireAuth();
-
   if (!auth.user) return null;
+
+  // note storage provider should be defined when the user is logged in
+
   return (
-    <div className="flex min-h-screen bg-gray-200">
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="mt-24 text-center">
+    <StorageProvider>
+      <div className="flex flex-col min-h-screen bg-gray-200">
+
+        <div className="pb-10 text-center border-gray-900 sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="mt-6 text-3xl font-extrabold text-center text-gray-900">
             {`Welcome ${auth.user.name}!`}
           </h2>
@@ -23,10 +28,13 @@ const DashBoardPage: React.FC = () => {
             Sign out
           </button>
         </div>
-        <UploadFileForm />
+
+        <div className='flex flex-row'>
+          <Menu />
+          <Gallery />
+        </div>
       </div>
-      <Gallery />,
-    </div>
+    </StorageProvider>
   );
 };
 export default DashBoardPage;

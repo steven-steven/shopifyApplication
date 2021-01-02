@@ -1,22 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext, ReactNode } from "react";
 import { storage, db } from '../../config/firebase';
 import { useAuth } from './useAuth';
 import { v4 as uuidv4 } from 'uuid';
+import { RepositoryContext, ActionTypes, InitialStateType } from '../context/repositoryContext'
 
-export const useStorage = () => {
+const useStorageProvider = () => {
   const { user } = useAuth();
+  const { state, dispatch }: { state: InitialStateType, dispatch: React.Dispatch<any> } = useContext(RepositoryContext);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
-  const [userImages, setUserImages] = useState([]);
 
   const userStorage = storage.ref().child(user.uid);
+  const userFirestore = db.collection('users').doc(user.uid)
 
   const createImage = (imgObj) => {
-    // upload the user data to Firestore
-    return db
-      .collection('users')
-      .doc(user.uid)
-      .collection('images')
+    // upload the meta data to Firestore
+    return userFirestore.collection('images')
       .doc(imgObj.imageId)
       .set(imgObj)
       .catch((error) => {
@@ -24,29 +23,15 @@ export const useStorage = () => {
       });
   };
 
-  // const listPaginatedFiles = async () => {
-  //   const fileResults = [];
-  //   // Fetch the first page of 100.
-  //   let firstPage = await userStorage.list({ maxResults: 100 });
-  //   await Promise.all(firstPage.items.map(async (itemRef) => {
-  //     const url = await getUrl(itemRef);
-  //     fileResults.push(url);
-  //   }));
-
-  //   // Fetch the second page if there are more elements.
-  //   while (firstPage.nextPageToken) {
-  //     const secondPage = await userStorage.list({
-  //       maxResults: 100,
-  //       pageToken: firstPage.nextPageToken,
-  //     });
-  //     await Promise.all(secondPage.items.map(async (itemRef) => {
-  //       const url = await getUrl(itemRef);
-  //       fileResults.push(url);
-  //     }));
-  //     firstPage = secondPage;
-  //   }
-  //   return fileResults;
-  // }
+  const deleteImage = (imageId) => {
+    // delete the meta data to Firestore
+    return userFirestore.collection('images')
+      .doc(imageId)
+      .delete()
+      .catch((error) => {
+        return { error };
+      });
+  };
 
   // Subscribe to all image document in the collection
   useEffect(() => {
@@ -57,15 +42,18 @@ export const useStorage = () => {
       .onSnapshot((querySnapshot) => {
         const images = [];
         querySnapshot.forEach((doc) => {
+          const imageData = doc.data()
           images.push({
-            src: doc.data().url,
-            thumbnail: doc.data().url,
-            caption: doc.data().name,
+            id: imageData.imageId,
+            src: imageData.url,
+            thumbnail: imageData.url,
+            caption: imageData.name,
             thumbnailWidth: 320,
             thumbnailHeight: 212
           });
         })
-        setUserImages(images);
+        console.log('dispatchin....');
+        dispatch({ type: ActionTypes.SET_USER_IMAGES, payload: images });
       });
     return () => unsubscribe();
   }, []);
@@ -73,7 +61,6 @@ export const useStorage = () => {
   // runs every time the file value changes. Then adds that.
   // unique id for file name?
   const uploadFiles = (files) => {
-
     const promises = [];
     files.forEach(file => {
       // storage ref
@@ -107,5 +94,32 @@ export const useStorage = () => {
       .catch(err => console.log(err.code));
   };
 
-  return { uploadFiles, userImages, progress, error };
+  const deleteSelectedFiles = () => {
+    // delete entry in firebase storage, then the metadata in firestore
+    const promises = [];
+    state.selectedPicsId.forEach(id => {
+      const storageRef = userStorage.child(id);
+      const deleteTask = storageRef.delete().then(() => {
+        return deleteImage(id)
+      });
+      promises.push(deleteTask);
+    });
+    Promise.all(promises)
+      .then(() => alert('Files Deleted'))
+      .catch(err => console.log(err.code));
+  }
+
+  return { uploadFiles, deleteSelectedFiles, progress, error };
+};
+
+const storageContext = createContext({ progress: null, error: null });
+const { Provider } = storageContext;
+
+export function StorageProvider(props: { children: ReactNode }): JSX.Element {
+  const storage = useStorageProvider();
+  return <Provider value={storage}>{props.children}</Provider>;
+}
+
+export const useStorage: any = () => {
+  return useContext(storageContext);
 };
