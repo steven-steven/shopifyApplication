@@ -1,6 +1,5 @@
 import React, { useContext, useMemo } from 'react'
 import { SelectionContext, InitialStateType, ActionTypes } from './context/selectionContext'
-import { CgChevronDoubleDownR } from 'react-icons/cg';
 
 const DetailSection = () => {
   const { state, dispatch }: { state: InitialStateType, dispatch: React.Dispatch<any> } = useContext(SelectionContext);
@@ -12,18 +11,18 @@ const DetailSection = () => {
 
   if (!state.selectedMovie) return (<></>)
   return (
-    <div className='h-72 bg-gray-800 text-white'>
+    <div className='text-white bg-gray-800 h-72'>
       {state.selectedMovie && (
         <div className='flex flex-row h-full'>
           <img className='h-full max-w-xs' src={state.selectedMovie.poster} alt="poster" />
-          <div className='flex-grow flex flex-col'>
+          <div className='flex flex-col flex-grow'>
             <div className='flex-grow p-3'>
-              <p className='font-bold text-center pb-3'>{state.selectedMovie.title}</p>
+              <p className='pb-3 font-bold text-center'>{state.selectedMovie.title}</p>
               <p>Year: {state.selectedMovie.year}</p>
               <p>Type: {state.selectedMovie.type}</p>
             </div>
             <button
-              className='disabled:opacity-10 disabled:hover:none m-1 py-2 px-3 text-white transition-colors duration-150 bg-blue-500 rounded-lg'
+              className='px-3 py-2 m-1 text-white transition-colors duration-150 bg-blue-500 rounded-lg disabled:opacity-10 disabled:hover:none'
               onClick={addSelectedToNomination}
               disabled={isAlreadyInNomination}
             >
