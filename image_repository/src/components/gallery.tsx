@@ -6,7 +6,7 @@ const CustomGallery = (): JSX.Element => {
   const { state, dispatch }: { state: InitialStateType, dispatch: React.Dispatch<any> } = useContext(RepositoryContext);
 
   const customImageList: Image[] = useMemo(() => state.userImages.map((i) => {
-    i.customOverlay = (<div className='absolute bottom-0 w-full p-2 text-white bg-gray-800 overflow-ellipsis'>
+    i.customOverlay = (<div className='absolute bottom-0 w-full p-2 overflow-hidden text-sm text-white bg-gray-800'>
       {i.caption}
     </div>)
     return i;
@@ -19,8 +19,8 @@ const CustomGallery = (): JSX.Element => {
   }
 
   return (
-    <div>
-      <Gallery images={customImageList} onSelectImage={onSelectImage} lightBoxWidth={1536} backdropClosesModal={true} />,
+    <div className='block w-full'>
+      <Gallery images={customImageList} onSelectImage={onSelectImage} lightBoxWidth={1536} backdropClosesModal={true} />
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useStorage } from '../hooks/useStorage';
 
 function UploadFileForm() {
-  const [files, setFiles] = useState(null);
+  const [uploadedMsg, setUploadedMsg] = useState(null);
   const [error, setError] = useState(null);
   // Getting the progress and url from the hook
   const { uploadFiles, progress } = useStorage();
@@ -18,30 +18,27 @@ function UploadFileForm() {
         if (types.includes(newFile.type)) {
           newFiles.push(newFile);
         } else {
-          setFiles(null);
+          setUploadedMsg(null);
           setError("Please select an image file (png or jpg)");
           return;
         }
       }
     }
+    uploadFiles(newFiles);
+    setUploadedMsg(`uploaded ${newFiles.length} image(s)!`)
     setError(null);
-    setFiles(newFiles);
   };
-
-  useEffect(() => {
-    if (files) uploadFiles(files)
-  }, [files]);
 
   return (
     <div>
       <form>
         <label>
           <input type="file" multiple onChange={handleChange} />
-          <span>Upload Images</span>
         </label>
       </form>
       {error && <p>{error}</p>}
-      {files && <p>{progress}% uploaded</p>}
+      {uploadedMsg && <p>Status: {progress}% uploaded</p>}
+      {uploadedMsg && !error && <p>{uploadedMsg}</p>}
     </div>
   );
 }

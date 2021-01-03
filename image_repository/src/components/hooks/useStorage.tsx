@@ -35,10 +35,7 @@ const useStorageProvider = () => {
 
   // Subscribe to all image document in the collection
   useEffect(() => {
-    const unsubscribe = db
-      .collection('users')
-      .doc(user.uid)
-      .collection('images')
+    const unsubscribe = userFirestore.collection('images')
       .onSnapshot((querySnapshot) => {
         const images = [];
         querySnapshot.forEach((doc) => {
@@ -48,25 +45,43 @@ const useStorageProvider = () => {
             src: imageData.url,
             thumbnail: imageData.url,
             caption: imageData.name,
-            thumbnailWidth: 320,
-            thumbnailHeight: 212
+            thumbnailWidth: imageData.thumbnailWidth || 320,
+            thumbnailHeight: imageData.thumbnailHeight || 212
           });
         })
-        console.log('dispatchin....');
         dispatch({ type: ActionTypes.SET_USER_IMAGES, payload: images });
       });
     return () => unsubscribe();
   }, []);
 
+  const getThumbnailSize = (newFile) => {
+    const height = 212;
+    let width = 320; // 
+
+    return new Promise<{ width: number, height: number }>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(newFile);
+      reader.onerror = reject;
+      reader.onload = (function (theFile) {
+        var image = new Image();
+        image.src = theFile.target.result as string;
+        image.onload = () => {
+          width = Math.round(image.width * height / image.height); // resize width based on the desired height and mantaining aspect ratio
+          resolve({ width, height });
+        }
+      });
+    })
+  }
   // runs every time the file value changes. Then adds that.
   // unique id for file name?
   const uploadFiles = (files) => {
     const promises = [];
-    files.forEach(file => {
+    files.forEach(async file => {
       // storage ref
       const newFileId = uuidv4();
       const storageRef = userStorage.child(newFileId);
       const uploadTask = storageRef.put(file);
+      const { width: thumbnailWidth = 320, height: thumbnailHeight = 212 } = await getThumbnailSize(file);
       promises.push(uploadTask);
 
       uploadTask.on(
@@ -85,12 +100,11 @@ const useStorageProvider = () => {
         async () => {
           // get the public download img url
           const downloadUrl = await storageRef.getDownloadURL();
-          await createImage({ url: downloadUrl, name: file.name, imageId: newFileId })
+          await createImage({ url: downloadUrl, name: file.name, imageId: newFileId, thumbnailWidth, thumbnailHeight })
         },
       );
     });
     Promise.all(promises)
-      .then(() => alert('All files uploaded'))
       .catch(err => console.log(err.code));
   };
 

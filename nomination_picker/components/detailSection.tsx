@@ -22,7 +22,7 @@ const DetailSection = () => {
               <p>Type: {state.selectedMovie.type}</p>
             </div>
             <button
-              className='px-3 py-2 m-1 text-white transition-colors duration-150 bg-blue-500 rounded-lg disabled:opacity-10 disabled:hover:none'
+              className='px-3 py-2 m-1 text-white transition-colors duration-150 bg-blue-500 rounded-lg disabled:opacity-10 disabled:cursor-not-allowed disabled:hover:none'
               onClick={addSelectedToNomination}
               disabled={isAlreadyInNomination}
             >

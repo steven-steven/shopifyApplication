@@ -27,9 +27,7 @@ const useAuthProvider = () => {
       .doc(user.uid)
       .get()
       .then((userData) => {
-        console.log('datatbase user');
         if (userData.data()) {
-          console.log(userData.data());
           setUser(userData.data());
         }
       });
@@ -51,8 +49,6 @@ const useAuthProvider = () => {
     return auth
       .signInWithEmailAndPassword(email, password)
       .then((response) => {
-        console.log('logged inn');
-        console.log(response.user);
         setUser(response.user);
         getUserAdditionalData(response.user);
         return response.user;

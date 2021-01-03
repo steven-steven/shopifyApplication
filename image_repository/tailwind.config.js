@@ -79,6 +79,7 @@ module.exports = {
       "active",
       "group-hover",
       "odd",
+      "disabled",
       "even",
     ],
   },

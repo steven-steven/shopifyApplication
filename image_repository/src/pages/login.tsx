@@ -15,6 +15,14 @@ const LoginPage: React.FC = () => {
               </a>
             </Link>
           </p>
+          <p className="text-center text-gray-600 text-md">
+            {"or Go back "}
+            <Link href="/">
+              <a href="#" className="text-blue-500">
+                Home
+              </a>
+            </Link>
+          </p>
         </div>
         <div className="px-4 py-8 mt-8 bg-white shadow sm:rounded-lg sm:px-10">
           <LoginForm />
