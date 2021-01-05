@@ -11,6 +11,8 @@ Stack:
 - Typescript
 - Tailwind css
 
+<img src="/readmeResources/nominatinPicker_demo.gif" width="300"/>
+
 ## Back-end Challange: Build an Image repository
 Link to the Final Product: https://shopify-image-repository.vercel.app
 
@@ -20,3 +22,5 @@ Stack:
 - Firebase storage (to store uploaded images on the cloud)
 - Firestore (to store user and image metadata)
 - [react-grid-gallery](https://www.npmjs.com/package/react-grid-gallery) to display images in a grid
+
+<img src="/readmeResources/imagerepoDemo.gif" width="300" />
